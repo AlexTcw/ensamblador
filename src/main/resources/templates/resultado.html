@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultado del Análisis ASM</title>
+</head>
+<body>
+    <h1>Resultado del Análisis ASM</h1>
+    
+    <div th:if="${seccion != null}">
+        <h2>Data Segment:</h2>
+        <textarea rows="10" cols="80" th:text="${seccion.dataSegment}"></textarea>
+        
+        <h2>Code Segment:</h2>
+        <textarea rows="10" cols="80" th:text="${seccion.codeSegment}"></textarea>
+    </div>
+    <div th:if="${seccion == null}">
+        <p>No se ha cargado ningún archivo o el archivo no es válido.</p>
+    </div>
+    
+    <button>guardar</button>
+</body>
+</html>

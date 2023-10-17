@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error en el Análisis ASM</title>
+</head>
+<body>
+    <h1>Error en el Análisis ASM</h1>
+    
+    <div th:if="${error != null}">
+        <p th:text="${error}"></p>
+    </div>
+</body>
+</html>
