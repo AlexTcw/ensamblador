@@ -1,23 +1,60 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Resultado del Análisis ASM</title>
+	<meta charset="UTF-8">
+	<title>Resultado del Análisis ASM</title>
 </head>
+<style>
+	.segments {
+		display: inline-block;
+		vertical-align: top;
+	}
+
+	.reservadas {
+		display: inline-block;
+		vertical-align: top;
+		margin-left: 20px;
+		/* Ajusta el margen izquierdo según sea necesario */
+	}
+</style>
+
 <body>
-    <h1>Resultado del Análisis ASM</h1>
-    
-    <div th:if="${seccion != null}">
-        <h2>Data Segment:</h2>
-        <textarea rows="10" cols="80" th:text="${seccion.dataSegment}"></textarea>
-        
-        <h2>Code Segment:</h2>
-        <textarea rows="10" cols="80" th:text="${seccion.codeSegment}"></textarea>
-    </div>
-    <div th:if="${seccion == null}">
-        <p>No se ha cargado ningún archivo o el archivo no es válido.</p>
-    </div>
-    
-    <button>guardar</button>
+	<h1>Resultado del Análisis ASM</h1>
+
+	<div th:if="${seccion != null}">
+		<div class="segments">
+			<h2>Data Segment:</h2>
+			<textarea rows="10" cols="80" th:text="${seccion.dataSegment}"></textarea>
+
+			<h2>Code Segment:</h2>
+			<textarea rows="10" cols="80" th:text="${seccion.codeSegment}"></textarea>
+		</div>
+
+		<!-- Agrega un bloque para mostrar palabras reservadas con líneas de código a la derecha -->
+		<div th:if="${palabrasReservadasConLineas != null}" class="reservadas">
+			<h2>Palabras Reservadas:</h2>
+			<table>
+				<tr>
+					<th></th>
+					<th></th>
+				</tr>
+				<tr th:each="entry : ${palabrasReservadasConLineas}">
+					<td th:text="${entry.key}"></td>
+					<td>
+						<textarea rows="3" cols="50" th:text="${entry.value}" readonly="readonly"></textarea>
+					</td>
+				</tr>
+
+			</table>
+		</div>
+	</div>
+
+	<div th:if="${seccion == null}">
+		<p>No se ha cargado ningún archivo o el archivo no es válido.</p>
+	</div>
+
+	<button>guardar</button>
 </body>
+
 </html>
