@@ -1,60 +1,79 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head>
-	<meta charset="UTF-8">
-	<title>Resultado del Análisis ASM</title>
+    <meta charset="UTF-8">
+    <title>Resultado del Análisis ASM</title>
 </head>
 <style>
-	.segments {
-		display: inline-block;
-		vertical-align: top;
-	}
+    .segments {
+        display: inline-block;
+        vertical-align: top;
+    }
 
-	.reservadas {
-		display: inline-block;
-		vertical-align: top;
-		margin-left: 20px;
-		/* Ajusta el margen izquierdo según sea necesario */
-	}
+    .reservadas, .palabras-con-tipo {
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    .reservadas {
+        margin-left: 20px;
+        /* Ajusta el margen izquierdo según sea necesario */
+    }
+
+    .palabras-con-tipo {
+        margin-left: 20px; /* Opcional: ajusta el margen entre reservadas y palabras-con-tipo */
+        margin-top: 20px;
+    }
 </style>
-
 <body>
-	<h1>Resultado del Análisis ASM</h1>
+    <h1>Resultado del Análisis ASM</h1>
 
-	<div th:if="${seccion != null}">
-		<div class="segments">
-			<h2>Data Segment:</h2>
-			<textarea rows="10" cols="80" th:text="${seccion.dataSegment}"></textarea>
+    <div th:if="${seccion != null}">
+        <div class="segments">
+            <h2>Data Segment:</h2>
+            <textarea rows="10" cols="80" th:text="${seccion.dataSegment}"></textarea>
 
-			<h2>Code Segment:</h2>
-			<textarea rows="10" cols="80" th:text="${seccion.codeSegment}"></textarea>
-		</div>
+            <h2>Code Segment:</h2>
+            <textarea rows="10" cols="80" th:text="${seccion.codeSegment}"></textarea>
+        </div>
 
-		<!-- Agrega un bloque para mostrar palabras reservadas con líneas de código a la derecha -->
-		<div th:if="${palabrasReservadasConLineas != null}" class="reservadas">
-			<h2>Palabras Reservadas:</h2>
-			<table>
-				<tr>
-					<th></th>
-					<th></th>
-				</tr>
-				<tr th:each="entry : ${palabrasReservadasConLineas}">
-					<td th:text="${entry.key}"></td>
-					<td>
-						<textarea rows="3" cols="50" th:text="${entry.value}" readonly="readonly"></textarea>
-					</td>
-				</tr>
+        <!-- Agrega un bloque para mostrar palabras reservadas con líneas de código y palabras en el código con tipo en la misma línea -->
+        <div th:if="${reservadasEnCodigo != null}" class="reservadas">
+            <h2>Palabras Reservadas:</h2>
+            <table>
+                <tr>
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tr th:each="entry : ${reservadasEnCodigo}">
+                    <td th:text="${entry.key}"></td>
+                    <td>
+                        <textarea rows="3" cols="50" th:text="${entry.value}" readonly="readonly"></textarea>
+                    </td>
+                </tr>
+            </table>
+        </div>
 
-			</table>
-		</div>
-	</div>
+        <!-- Agrega un bloque para mostrar las palabras en el código con tipo -->
+        <div th:if="${palabrasConTipo != null}" class="palabras-con-tipo">
+            <h2>Palabras en el Código con Tipo:</h2>
+            <table>
+                <tr>
+                    <th>Palabra</th>
+                    <th>Tipo</th>
+                </tr>
+                <tr th:each="entry : ${palabrasConTipo}">
+                    <td th:text="${entry.key}"></td>
+                    <td th:text="${entry.value}"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
 
-	<div th:if="${seccion == null}">
-		<p>No se ha cargado ningún archivo o el archivo no es válido.</p>
-	</div>
+    <div th:if="${seccion == null}">
+        <p>No se ha cargado ningún archivo o el archivo no es válido.</p>
+    </div>
 
-	<button>guardar</button>
+    <!-- Agrega un botón o lo que necesites aquí -->
 </body>
-
 </html>

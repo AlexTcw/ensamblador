@@ -1,6 +1,7 @@
 package com.asm.editor.controller;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +38,13 @@ public class AsmController {
 			Seccion seccion = asmService.detectarSecciones(file);
 			model.addAttribute("seccion", seccion);
 
-			// Busca palabras reservadas en la sección y las líneas de código que las
-			// contienen
-			Map<String, String> palabrasReservadasConLineas = asmService.findReservadas(seccion);
-			model.addAttribute("palabrasReservadasConLineas", palabrasReservadasConLineas);
+			// Llama al método para encontrar palabras reservadas con líneas de código
+			Map<String, String> reservadasEnCodigo = asmService.findReservadas(seccion);
+			model.addAttribute("reservadasEnCodigo", reservadasEnCodigo);
+
+			// Llama al método para dividir el código en palabras con tipos
+			Map<String, String> palabrasConTipo = asmService.divideCodigoEnPalabras(seccion);
+			model.addAttribute("palabrasConTipo", palabrasConTipo);
 
 			return "resultado"; // Renderiza la plantilla de resultado si se procesa correctamente
 		} catch (IOException e) {
