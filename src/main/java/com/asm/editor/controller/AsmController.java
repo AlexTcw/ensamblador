@@ -1,56 +1,74 @@
 package com.asm.editor.controller;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.asm.editor.model.Seccion;
+import com.asm.editor.model.dto.ResponseSection;
 import com.asm.editor.service.ReadASM;
 
-@Controller
+@RestController
 @RequestMapping("/asm")
+@CrossOrigin(origins = { "*" })
 public class AsmController {
 
 	@Autowired
 	ReadASM asmService;
 
-	@RequestMapping("/getCode")
-	public String mostrarFormulario() {
-		return "carga-archivo-asm"; // Renderiza la plantilla de carga de archivo
-	}
+    @PostMapping("/subirArchivo")
+    public ResponseEntity<byte[]> procesarArchivo(@RequestParam("file") MultipartFile file) throws IOException {
+        // Realiza las operaciones necesarias con el archivo (file) aquí
+
+        // Convierte el MultipartFile a un array de bytes
+        byte[] fileBytes = file.getBytes();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        // Ajusta el nombre del archivo como desees
+        headers.setContentDispositionFormData("attachment", file.getOriginalFilename());
+
+        // Devuelve el archivo como respuesta
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(fileBytes);
+    }
+
 
 	@PostMapping("/procesarArchivo")
-	public String procesarArchivo(@RequestParam("file") MultipartFile file, Model model) {
+	public ResponseSection ProcesarArchivo(@RequestParam("file") MultipartFile file) {
 		if (!file.getOriginalFilename().endsWith(".asm")) {
-			model.addAttribute("error", "El archivo debe tener la extensión '.asm'");
-			return "error"; // Renderiza la plantilla de error si el archivo no es válido
+			return null;
 		}
-
 		try {
+			
+			ResponseSection response = new ResponseSection();
+			
 			Seccion seccion = asmService.detectarSecciones(file);
-			model.addAttribute("seccion", seccion);
-
-			// Llama al método para encontrar palabras reservadas con líneas de código
 			Map<String, String> reservadasEnCodigo = asmService.findReservadas(seccion);
-			model.addAttribute("reservadasEnCodigo", reservadasEnCodigo);
-
-			// Llama al método para dividir el código en palabras con tipos
 			Map<String, String> palabrasConTipo = asmService.divideCodigoEnPalabras(seccion);
-			model.addAttribute("palabrasConTipo", palabrasConTipo);
+			
+			response.setPalabrasReservadas(seccion);
+			response.setReservadasInCodeMap(reservadasEnCodigo);
+			response.setPalabrasConCodigoDetect(palabrasConTipo);
 
-			return "resultado"; // Renderiza la plantilla de resultado si se procesa correctamente
+			return response;
+			
 		} catch (IOException e) {
-			model.addAttribute("error", "Error al procesar el archivo.");
-			return "error"; // Renderiza la plantilla de error en caso de excepción
+			System.out.println(e);
+			return null;
 		}
+
 	}
 
 }

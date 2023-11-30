@@ -36,8 +36,8 @@ public class ReadASMimp implements ReadASM {
 			String currentSection = null;
 
 			// Patrones de expresión regular para detectar las secciones
-			Pattern dataPattern = Pattern.compile("^\\s*section\\s+\\.data", Pattern.CASE_INSENSITIVE);
-			Pattern codePattern = Pattern.compile("^\\s*section\\s+\\.text", Pattern.CASE_INSENSITIVE);
+			Pattern dataPattern = Pattern.compile("^\\s*\\.data", Pattern.CASE_INSENSITIVE);
+			Pattern codePattern = Pattern.compile("^\\s*\\.code", Pattern.CASE_INSENSITIVE);
 
 			while ((line = reader.readLine()) != null) {
 				Matcher dataMatcher = dataPattern.matcher(line);
@@ -182,41 +182,74 @@ public class ReadASMimp implements ReadASM {
 																					// antes de verificar
 	}
 
-	private String detectarTipo(String palabra) {
-	    // Patrón para números hexadecimales, p. ej., 0x2A
-	    String patronHexadecimal = "0[xX][0-9A-Fa-f]+";
+	private static String detectarTipo(String palabra) {
+		Map<Pattern, String> tipoPatronMap = new HashMap<>();
+		tipoPatronMap.put(Pattern.compile("\\bbyte\\b", Pattern.CASE_INSENSITIVE), "Definición Dato tipo byte");
+		tipoPatronMap.put(Pattern.compile("\\bsbyte\\b", Pattern.CASE_INSENSITIVE), "Definición Dato tipo sbyte");
+		tipoPatronMap.put(Pattern.compile("\\bword\\b", Pattern.CASE_INSENSITIVE), "Definición Dato tipo word");
+		tipoPatronMap.put(Pattern.compile("\\bSWORD\\b", Pattern.CASE_INSENSITIVE), "Definición Dato tipo sword");
+		tipoPatronMap.put(Pattern.compile("\\bDWORD\\b", Pattern.CASE_INSENSITIVE), "Definición Dato tipo dword");
+		tipoPatronMap.put(Pattern.compile("\\bSDWORD\\b", Pattern.CASE_INSENSITIVE), "Definición Dato tipo sdword");
+		tipoPatronMap.put(Pattern.compile("\\bFWORD\\b", Pattern.CASE_INSENSITIVE), "Definición Dato tipo fword");
+		tipoPatronMap.put(Pattern.compile("\\bQWORD\\b", Pattern.CASE_INSENSITIVE), "Definición Dato tipo qword");
+		tipoPatronMap.put(Pattern.compile("\\bTBYTE\\b", Pattern.CASE_INSENSITIVE), "Definición Dato tipo tbyte");
+		tipoPatronMap.put(Pattern.compile("\\bREAL4\\b", Pattern.CASE_INSENSITIVE), "Definición Dato tipo real4");
+		tipoPatronMap.put(Pattern.compile("\\bREAL8\\b", Pattern.CASE_INSENSITIVE), "Definición Dato tipo real8");
+		tipoPatronMap.put(Pattern.compile("\\bREAL10\\b", Pattern.CASE_INSENSITIVE), "Definición Dato tipo real10");
+		tipoPatronMap.put(Pattern.compile("\\bDB\\b", Pattern.CASE_INSENSITIVE), "Directiva (entero 8 bits)");
+		tipoPatronMap.put(Pattern.compile("\\bDW\\b", Pattern.CASE_INSENSITIVE), "Directiva (entero 16 bits)");
+		tipoPatronMap.put(Pattern.compile("\\bDD\\b", Pattern.CASE_INSENSITIVE), "Directiva (entero 32 bits)");
+		tipoPatronMap.put(Pattern.compile("\\bDQ\\b", Pattern.CASE_INSENSITIVE), "Directiva (entero 64 bits)");
+		tipoPatronMap.put(Pattern.compile("\\bDT\\b", Pattern.CASE_INSENSITIVE),
+				"Directiva (entero 80 bits - 10 bytes)");
+		tipoPatronMap.put(
+				Pattern.compile("\\b([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\b", Pattern.CASE_INSENSITIVE),
+				"Variable tipo byte sin signo");
+		tipoPatronMap.put(
+				Pattern.compile("\\b(-[1-9][0-9]?|[0-9]|-1[0-9]{2}|-2[0-5][0-9])\\b", Pattern.CASE_INSENSITIVE),
+				"Variable tipo byte con signo");
+		tipoPatronMap.put(Pattern.compile("\\b(-?\\d+(\\.\\d+)?)\\b", Pattern.CASE_INSENSITIVE),
+				"Variable tipo real corto");
+		tipoPatronMap.put(Pattern.compile("\\b(-?\\d+\\.\\d+)\\b", Pattern.CASE_INSENSITIVE),
+				"Variable tipo real largo");
+		tipoPatronMap.put(Pattern.compile("\\b(-?\\d+\\.\\d+[eE][-+]?\\d+)\\b", Pattern.CASE_INSENSITIVE),
+				"Variable tipo real de precisión extendida");
+		tipoPatronMap.put(Pattern.compile("\\b([-+]?0[xX][0-9a-fA-F]+|[0-9a-fA-F]+h)\\b", Pattern.CASE_INSENSITIVE),
+				"Constante entera hexadecimal");
+		tipoPatronMap.put(Pattern.compile("\\b([-+]?0[0-7]+|[0-7]+q)\\b", Pattern.CASE_INSENSITIVE),
+				"Constante entera octal");
+		tipoPatronMap.put(Pattern.compile("\\b([-+]?0[0-7]+q)\\b", Pattern.CASE_INSENSITIVE),
+				"Constante entera octal con sufijo q");
+		tipoPatronMap.put(Pattern.compile("\\b([-+]?0[0-7]+0)\\b", Pattern.CASE_INSENSITIVE),
+				"Constante entera octal con sufijo 0");
+		tipoPatronMap.put(Pattern.compile("\\b([-+]?[0-9]+d)\\b", Pattern.CASE_INSENSITIVE),
+				"Constante entera decimal");
+		tipoPatronMap.put(Pattern.compile("\\b([-+]?[0-9]+b)\\b", Pattern.CASE_INSENSITIVE),
+				"Constante entera binaria");
+		tipoPatronMap.put(Pattern.compile("\\b([-+]?[0-9]+r)\\b", Pattern.CASE_INSENSITIVE),
+				"Constante entera real codificado");
+		tipoPatronMap.put(Pattern.compile("\\b([-+]?[0-9]+t)\\b", Pattern.CASE_INSENSITIVE),
+				"Constante entera decimal(alternativo)");
+		tipoPatronMap.put(Pattern.compile("\\b([-+]?[0-9]+y)\\b", Pattern.CASE_INSENSITIVE),
+				"Constante entera binario(alternativo)");
+		tipoPatronMap.put(Pattern.compile("\\b(MOV|ADD|SUB|JMP|CMP)\\b", Pattern.CASE_INSENSITIVE),
+				"Palabra reservada");
+		tipoPatronMap.put(Pattern.compile("\\b(ZF|CF|SF|OF)\\b", Pattern.CASE_INSENSITIVE), "Bandera");
+		tipoPatronMap.put(Pattern.compile(
+				"\\b(EAX|EBX|ECX|EDX|ESI|EDI|EBP|ESP|AX|BX|CX|DX|SI|DI|BP|SP|AL|BL|CL|DL|AH|BH|CH|DH|CS|DS|SS|ES|FS|GS)\\b",
+				Pattern.CASE_INSENSITIVE), "Registro");
 
-	    // Patrón para números binarios, p. ej., 0b1010
-	    String patronBinario = "0[bB][01]+";
+		// Agrega patrones para variables de otros tipos (DWORD, QWORD, TBYTE, REAL4,
+		// REAL8, REAL10) según sea necesario.
 
-	    // Patrón para números decimales, p. ej., 42 o -3
-	    String patronDecimal = "-?\\d+";
+		for (Map.Entry<Pattern, String> entry : tipoPatronMap.entrySet()) {
+			Matcher matcher = entry.getKey().matcher(palabra);
+			if (matcher.find()) {
+				return entry.getValue();
+			}
+		}
 
-	    // Implementa patrones para detectar el tipo de la palabra (registros, variables numéricas, cadenas, etc.)
-	    if (palabra.matches("\\bEAX\\b|\\bEBX\\b|\\bECX\\b|\\bEDX\\b|\\beax\\b|\\bebx\\b|\\becx\\b|\\bedx\\b|[A-Za-z]+,")) {
-	        return "Registro";
-	    } else if (palabra.matches(patronDecimal)) {
-	        return "Variable numérica (decimal)";
-	    } else if (palabra.matches(patronHexadecimal)) {
-	        return "Variable numérica (hexadecimal)";
-	    } else if (palabra.matches(patronBinario)) {
-	        return "Variable numérica (binaria)";
-	    } else if (palabra.startsWith("\"") && palabra.endsWith("\"")) {
-	        return "Cadena";
-	    } else if (palabra.matches("\\bDD\\b|\\bdd\\b")) {
-	        return "Double Word";
-	    } else {
-	        // Agrega más patrones según sea necesario
-	        // Por defecto, si no coincide con ningún patrón, se etiqueta como "Otro"
-	        return "Otro";
-	    }
+		return "carácter";
 	}
-
-
-
-
-
-
-
 
 }

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Upload Form</title>
+    <link rel="stylesheet" href="/src/main/resources/templates/request.css">
+  </head>
+  <body>
+    <h2>Archivo Original</h2>
+    <textarea id="originalDoc" readonly rows="10"></textarea>
+    <h2>Archivo analizado</h2>    
+    <form id="uploadForm" enctype="multipart/form-data">
+      <input type="file" name="fileInput" id="fileInput" required />
+      <button type="button" onclick="uploadFile()">Upload File</button>
+    </form>
+    <textarea id="jsonResult" readonly rows="10"></textarea>
+    <h3>Palabras Reservadas</h3>
+    <textarea id="reservadas" readonly rows="10"></textarea>
+    <h3>Code Y Segment</h3>
+    <textarea id="CodeSeg" readonly rows="10"></textarea>
+    <h3>Palabras Con tipo de datos</h3>
+    <textarea id="palConType" readonly rows="10"></textarea>
+
+    <h3>Errores encontrados</h3>
+    <textarea id="errors" readonly rows="10"></textarea>
+    <script src="your-script.js"></script>
+  </body>
+</html>

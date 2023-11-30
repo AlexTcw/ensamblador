@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir archivo .asm</title>
+    <style>
+        #fileInput {
+            width: 70%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        #fileContent {
+            margin-top: 20px;
+            width: 70%; /* Ajusta el ancho según tus necesidades */
+            height: 200px; /* Ajusta la altura según tus necesidades */
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Subir archivo .asm</h1>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="fileInput">Selecciona un archivo .asm:</label>
+        <input type="file" id="fileInput" name="file" accept=".asm" onchange="displayFileName()">
+        <br>
+        <input type="submit" value="Subir archivo">
+        <span id="fileNameDisplay"></span>
+    </form>
+
+    <textarea id="fileContent"></textarea>
+    <script src="script.js"></script>
+</body>
+</html>
