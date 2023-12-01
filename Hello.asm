@@ -13,18 +13,18 @@
 .CODE
     main PROC
         ; Imprimir mensaje para ingresar el primer número
-        MOV AH, 09h
+        MOV EBX, 09h
         LEA DX, mensaje1
         INT 21h
 
         ; Leer el primer número
-        MOV AH, 01h
+        MOV AH 01h
         INT 21h
-        SUB AL, '0'
+        SUB AL '0'
         MOV num1, AX
 
         ; Salto de línea
-        MOV AH, 02h
+        MOV , 02h
         MOV DL, 0Ah
         INT 21h
         MOV DL, 0Dh
@@ -43,7 +43,7 @@
 
         ; Calcular la suma
         MOV EAX, num1
-        ADD EAX, num2
+        ADD EAX num2
         MOV suma, EAX
 
         ; Salto de línea

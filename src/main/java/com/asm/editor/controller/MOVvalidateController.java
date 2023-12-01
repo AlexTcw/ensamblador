@@ -18,17 +18,6 @@ public class MOVvalidateController {
 	@GetMapping("/validarPalabras")
 	public void validarMov() {
 		
-		Map<String, String> palabras = new HashMap<>();
-        palabras.put("id", "1");
-        palabras.put("palabra1", "mov");
-        palabras.put("palabra2", "EAX");
-        palabras.put("palabra3", ",");
-        palabras.put("palabra4", "ebx");
-        
-		
-		String cadenaFiltrada = validarMov.filtrar(palabras);
-
-        System.out.println(cadenaFiltrada);
 
 	}
 }

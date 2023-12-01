@@ -47,6 +47,9 @@ function uploadFile() {
 
             // Después de procesar el archivo, obtén y muestra el archivo original
             getOriginal(fileInput.files[0]);
+
+            // Ejecutar la función para obtener y mostrar errores
+            getErrors(fileInput.files[0]);
         })
         .catch(error => console.log('error', error));
 }
@@ -84,10 +87,6 @@ function formatAssemblyCode(assemblyCode) {
     return formattedCode;
 }
 
-
-
-
-
 function getOriginal(file) {
     var formdata = new FormData();
     formdata.append("file", file);
@@ -106,3 +105,23 @@ function getOriginal(file) {
         })
         .catch(error => console.log('error', error));
 }
+
+function getErrors(file) {
+    var formdata = new FormData();
+    formdata.append("file", file, file.name);
+  
+    var requestOptions = {
+      method: 'POST',
+      body: formdata,
+      redirect: 'follow'
+    };
+  
+    fetch("http://localhost:8080/asm/validateWords", requestOptions)
+      .then(response => response.text())
+      .then(result => {
+        // Mostrar errores en el textarea
+        document.getElementById("errors").value = result;
+      })
+      .catch(error => console.log('error', error));
+  }
+  

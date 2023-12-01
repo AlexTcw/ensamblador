@@ -1,5 +1,6 @@
 package com.asm.editor.service.validar;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -7,9 +8,9 @@ import org.springframework.stereotype.Service;
 @Service
 public interface ValidarMov {
 
-	String filtrar(Map<String, String> palabras);
-	String add(Map<String, String> palabras);
-	String sub(Map<String, String> palabras);
-	String jmp(Map<String, String> palabras);
-	String loop(Map<String, String> palabras);
+	public String mov(List<String> palabras);
+	public String add(List<String> palabras);
+	public String sub(List<String> palabras);
+	public String jmp(List<String> palabras);
+	public String loop(List<String> palabras);
 }
